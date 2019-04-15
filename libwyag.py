@@ -12,3 +12,7 @@ import os
 import re
 import sys
 import zlib
+
+arg_parser = argparse.ArgumentParser(description="My Git")
+arg_sub_parsers = arg_parser.add_subparsers(title="Commands", dest="command")
+arg_sub_parsers.required = True
