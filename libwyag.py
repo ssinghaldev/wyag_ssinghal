@@ -105,11 +105,35 @@ def repo_default_config():
 
     return ret
 
+def repo_find(path='.', required=True):
+    path = os.path.realpath(path)
+
+    if os.path.isdir(os.path.join(path, ".git")):
+        return GitRepository(path)
+    
+    # recurse in parents as we didn't find in current dir
+    parent = os.path.realpath(os.path.join(path, ".."))
+
+    # base case when we reach root (/)
+    if parent == path:
+        if required:
+            raise Exception("Not a git directory.")
+        else:
+            return None
+
+    return repo_find(parent, required)
+
+
 def main(argv=sys.argv[1:]):
     arg_parser = argparse.ArgumentParser(description="My Git")
 
     arg_sub_parsers = arg_parser.add_subparsers(title="Commands", dest="command")
     arg_sub_parsers.required = True
+
+    # adding all subparsers
+    argsp = arg_sub_parsers.add_parser("init", help="Initialize a new, empty repository.")
+    argsp.add_argument("path", metavar="directory", nargs="?", default=".", help="Where to create the repository.")
+
     
     args = arg_parser.parse_args(argv)
 
@@ -140,4 +164,8 @@ def main(argv=sys.argv[1:]):
     elif args.command == "show-ref":
         cmd_show_ref(args)
     elif args.command == "tag":
-        cmd_tag(args) 
+        cmd_tag(args)
+
+# All commands BRIDGE functions
+def cmd_init(args):
+    repo_create(args.path)
