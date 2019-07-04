@@ -173,6 +173,25 @@ def object_read(repo, sha):
         
         return c(repo, raw[y+1:])
 
+def object_write(obj, actually_write=True):
+    #Serialize object data
+    data = obj.serialize()
+
+    #Add header
+    result = obj.fmt + b' ' + str(len(data)).encode() + b'\x00' + data
+    
+    #Compute hash
+    sha = hashlib.sha1(result).hexdigest()
+
+    if actually_write:
+        #Compute path
+        path = repo_file(obj.repo, "objects", sha[0:2],sha[2:], mkdir=actually_write)
+
+        with open(path, 'wb') as f:
+            f.write(zlib.compress(result))
+        
+    return sha
+
 def object_find(repo, name, fmt=None, follow=True):
     return name
 
