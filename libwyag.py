@@ -13,6 +13,7 @@ import re
 import sys
 import zlib
 
+#GitRepository class
 class GitRepository:
     """ A git repository """
     worktree          = None
@@ -40,7 +41,7 @@ class GitRepository:
             if version != 0:
                 raise Exception("Unsupported repositoryformatversion %s" % version)
 
-
+# GitObject and its subclasses
 class GitObject(object):
     repo = None
 
@@ -69,6 +70,7 @@ class GitBlob(GitObject):
     def deserialize(self, data):
         self.blobdata = data
 
+#All GitRepository related funcs
 def repo_path(repo, *path):
     """Compute path under repo's gitdir"""
     return os.path.join(repo.gitdir, *path)
@@ -152,6 +154,7 @@ def repo_find(path='.', required=True):
 
     return repo_find(parent, required)
 
+# All GitObject related funcs
 def object_read(repo, sha):
     """Read object object_id from git repository repo.
        Return a GitObject whose exact type depends on the object"""
@@ -202,6 +205,11 @@ def object_write(obj, actually_write=True):
 def object_find(repo, name, fmt=None, follow=True):
     return name
 
+# All commands BRIDGE functions
+def cmd_init(args):
+    repo_create(args.path)
+
+# main function
  def main(argv=sys.argv[1:]):
     arg_parser = argparse.ArgumentParser(description="My Git")
 
@@ -243,7 +251,3 @@ def object_find(repo, name, fmt=None, follow=True):
         cmd_show_ref(args)
     elif args.command == "tag":
         cmd_tag(args)
-
-# All commands BRIDGE functions
-def cmd_init(args):
-    repo_create(args.path)
