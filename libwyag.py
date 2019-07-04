@@ -60,7 +60,14 @@ class GitObject(object):
     def deserialize(self):
         raise Exception("Unimplemented")
 
+class GitBlob(GitObject):
+    fmt = b'blob'
 
+    def serialize(self):
+        return self.blobdata
+    
+    def deserialize(self, data):
+        self.blobdata = data
 
 def repo_path(repo, *path):
     """Compute path under repo's gitdir"""
